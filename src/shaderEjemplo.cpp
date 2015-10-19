@@ -27,7 +27,6 @@ GLfloat *colors;
 // Function prototypes
 void leerImagen(char *ruta);
 void setPoints(float *image, float *points);
-void creaProyecciones(glm::mat4 model, glm::mat4 view, glm::mat4 projection);
 void maxValue(float *p);
 void setColor(float *p, float *color);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
@@ -43,6 +42,7 @@ int main() {
 	points = (GLfloat*) malloc(sizeof(GLfloat) * pixels * 3);
 	colors = (GLfloat*) malloc(sizeof(GLfloat) * pixels * 3);
 	char ruta[] = "/home/fgonzalez/Escritorio/SparseMatrix/salidaOPETCOO.img";
+
 	leerImagen(ruta);
 	maxValue(imagen);
 	setPoints(imagen, points);
@@ -122,6 +122,8 @@ int main() {
 	glBindBuffer(GL_ARRAY_BUFFER, vboPoints);
 	glBufferData(GL_ARRAY_BUFFER, 3 * pixels * sizeof(GLfloat), points, GL_STATIC_DRAW);
 
+	glGenBuffers(1, &vboColor);
+	glBindBuffer(GL_ARRAY_BUFFER, vboColor);
 	/* here we copy the shader strings into GL shaders, and compile them. we
 	 then create an executable shader 'program' and attach both of the compiled
 	 shaders. we link this, which matches the outputs of the vertex shader to
@@ -156,20 +158,21 @@ int main() {
 		 data on the graphics adapter's memory. in our case - the vertex points */
 		//coordenadas
 		//colores
-		glGenBuffers(1, &vboColor);
-		glBindBuffer(GL_ARRAY_BUFFER, vboColor);
 		glBufferData(GL_ARRAY_BUFFER, 3 * pixels * sizeof(GLfloat), colors, GL_DYNAMIC_DRAW);
 
 		/* the vertex array object (VAO) is a little descriptor that defines which
 		 data from vertex buffer objects should be used as input variables to vertex
 		 shaders. in our case - use our only VBO, and say 'every three floats is a
-		 variable' */glGenVertexArrays(1, &vao);
+		 variable' */
+
+		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
+
 		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
 		glBindBuffer(GL_ARRAY_BUFFER, vboPoints);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
+		glEnableVertexAttribArray(1);
 		glBindBuffer(GL_ARRAY_BUFFER, vboColor);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
@@ -186,8 +189,6 @@ int main() {
 		GLint modelLoc = glGetUniformLocation(shader_programme, "model");
 		GLint viewLoc = glGetUniformLocation(shader_programme, "view");
 		GLint projLoc = glGetUniformLocation(shader_programme, "projection");
-
-		//creaProyecciones(model, view, projection);
 
 		model = glm::rotate(model, glm::radians(anguloX), glm::vec3(1.0f, 0.0f, .0f));
 		model = glm::rotate(model, glm::radians(anguloY), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -264,23 +265,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		break;
 	}
 
-}
-
-void creaProyecciones(glm::mat4 model, glm::mat4 view, glm::mat4 projection) {
-
-	model = glm::translate(model, glm::vec3(0.5f, 0.5f, 0.0f));
-	model = glm::rotate(model, glm::radians(anguloX), glm::vec3(1.0f, 0.0f, 0.0f));    //(GLfloat) glfwGetTime() * 50.0f
-	model = glm::rotate(model, glm::radians(anguloY), glm::vec3(0.0f, 1.0f, 0.0f));    //(GLfloat) glfwGetTime() * 50.0f
-
-	glm::vec3 cameraPos = glm::vec3(0.0f, 32.0f, 100.0f);
-	glm::vec3 cameraTarget = glm::vec3(0.0f, 32.0f, 0.0f);
-
-	glm::vec3 cameraUp = glm::vec3(0.0f, 64.0f, 0.0f);
-
-	view = glm::lookAt(cameraPos, cameraTarget, cameraUp);
-
-	projection = glm::perspective(45.0f, (GLfloat) WIDTH / (GLfloat) HEIGHT, 0.1f, 300.0f);
-//	projection = glm::ortho(0.0f, (GLfloat) WIDTH, 0.0f, (GLfloat) HEIGHT, 0.1f, 300.0f);
 }
 
 void leerImagen(char *ruta) {

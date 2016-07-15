@@ -41,7 +41,7 @@ int main() {
 
 	points = (GLfloat*) malloc(sizeof(GLfloat) * pixels * 3);
 	colors = (GLfloat*) malloc(sizeof(GLfloat) * pixels * 3);
-	char ruta[] = "/home/fgonzalez/Escritorio/SparseMatrix/salidaOPETCOO.img";
+	char ruta[] = "salidaOPETCOO.img";
 
 	leerImagen(ruta);
 	maxValue(imagen);
